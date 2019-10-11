@@ -3,6 +3,7 @@ environment:
     # This will be used as part of the zipfile name
     # TODO change the project name
     PROJECT_NAME: rust-everywhere
+    RUST_BACKTRACE: full
   # TODO feel free to delete targets/channels you don't need
   matrix:
     # Stable channel
@@ -28,8 +29,8 @@ environment:
     #   CHANNEL: nightly
     # - TARGET: i686-pc-windows-msvc
     #   CHANNEL: nightly
-    - TARGET: x86_64-pc-windows-gnu
-      CHANNEL: nightly
+    # - TARGET: x86_64-pc-windows-gnu
+    #   CHANNEL: nightly
     - TARGET: x86_64-pc-windows-msvc
       CHANNEL: nightly
 
@@ -50,8 +51,8 @@ build: false
 # Equivalent to Travis' `script` phase
 # TODO modify this phase as you see fit
 test_script:
-  - cargo build --verbose
-  - cargo run
+#   - cargo build --verbose
+#   - cargo run
   - cargo test
 
 before_deploy:
