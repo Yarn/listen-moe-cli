@@ -1,0 +1,16 @@
+[package]
+name = "listen-moe-cli"
+version = "0.1.0"
+authors = ["ryan"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+hyper = "0.13.0-alpha.4"
+hyper-tls = "0.4.0-alpha.4"
+tokio = { version = "=0.2.0-alpha.6", default-features = false, features = ["rt-full"] }
+crossbeam = "0.7.2"
+rodio = "0.9.0"
+lewton = "0.9.4"
+color-backtrace = { version = "0.2" }
