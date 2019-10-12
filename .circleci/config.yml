@@ -35,7 +35,7 @@ jobs:
           command: cargo build --release --target "$TARGET"
       - run:
           name: prepare release zip
-          command: mkdir release && zip "release/$CIRCLE_PROJECT_REPONAME-$CIRCLE_TAG-$CIRCLE_TAG-x86_64-unknown-linux-gnu.zip" ./target/x86_64-unknown-linux-gnu/release/listen-moe-cli
+          command: mkdir release && zip "release/$CIRCLE_PROJECT_REPONAME-$CIRCLE_TAG-x86_64-unknown-linux-gnu.zip" ./target/x86_64-unknown-linux-gnu/release/listen-moe-cli
       - store_artifacts:
           # path: ./target/x86_64-unknown-linux-gnu/release/listen-moe-cli
           path: ./release
