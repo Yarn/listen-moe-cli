@@ -11,6 +11,13 @@ clap = "2.33.0"
 hyper = "0.13.0-alpha.4"
 hyper-tls = "0.4.0-alpha.4"
 tokio = { version = "=0.2.0-alpha.6", default-features = false, features = ["rt-full"] }
+futures = { package = "futures-preview", version = "0.3.0-alpha.19", features = ["compat", "io-compat"] }
+
+# tokio-tungstenite = "0.9.0"
+# url = "*"
+tokio-tungstenite = { git = "https://github.com/dbcfd/tokio-tungstenite.git", rev = "46ac8479773b0b77545b8a02e3422798c16baa93"}
+serde_json = "1.0"
+
 crossbeam = "0.7.2"
 rodio = "0.9.0"
 lewton = "0.9.4"

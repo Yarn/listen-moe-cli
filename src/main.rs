@@ -10,6 +10,8 @@ use rodio::source::Source;
 use lewton::inside_ogg::OggStreamReader;
 
 mod args;
+mod websocket;
+mod shared;
 
 struct ChannelReader {
     recv: Receiver<u8>,
@@ -49,13 +51,13 @@ impl std::iter::Iterator for VorbisStream {
             let maybe_buf = self.ogg.read_dec_packet_itl().unwrap();
             if let Some(buf) = maybe_buf {
                 if buf.len() == 0 {
-                    println!("buf len 0");
+                    // println!("buf len 0");
                     return Some(0);
                 }
                 self.buf = Some(buf);
                 self.buf.as_ref().unwrap()
             } else {
-                println!("no maybe buf");
+                // println!("no maybe buf");
                 return Some(0);
             }
         };
@@ -118,22 +120,49 @@ async fn main() {
     let https = HttpsConnector::new().unwrap();
     let client = Client::builder().build::<_, hyper::Body>(https);
     
-    const USER_AGENT: &'static str = concat!("user-moe-cli/", env!("CARGO_PKG_VERSION"), " (+https://github.com/Yarn/listen-moe-cli)");
-    
     let mut req = Request::builder();
     let req = req
         .method("GET")
         .uri("https://listen.moe/stream")
         .header("Range", "bytes=0-")
         .header("Referer", "https://listen.moe/stream")
-        .header("User-Agent", USER_AGENT)
+        .header("User-Agent", shared::USER_AGENT)
         .body(hyper::Body::empty())
         .expect("request builder");
         ;
     
     let res = client.request(req).await.unwrap();
     
-    println!("{:?}", res);
+    // println!("{:?}", res);
+    
+    tokio::spawn(async {
+        let ws = websocket::connect().await;
+        
+        let (_send, mut recv) = websocket::wrap_ws(ws).await;
+        
+        loop {
+            let msg = recv.get_json().await;
+            
+            let op = msg.get("op").unwrap().as_u64().unwrap();
+            if op == 1 {
+                let t = msg.get("t").unwrap().as_str().unwrap();
+                if t == "TRACK_UPDATE" {
+                    let d = msg.get("d").unwrap();
+                    let song = d.get("song").unwrap();
+                    let title = song.get("title").unwrap().as_str().unwrap();
+                    println!("now playing: {}", title);
+                    let artists = song.get("artists").unwrap().as_array().unwrap();
+                    for artist in artists {
+                        if let Some(name) = artist.get("name") {
+                            let name = name.as_str().unwrap();
+                            let name_romaji = artist.get("nameRomaji").map(|x| x.as_str().unwrap()).unwrap_or("");
+                            println!("  artist: {} ({})", name, name_romaji);
+                        }
+                    }
+                }
+            }
+        }
+    });
     
     let mut body = res.into_body();
     while let Some(next) = body.next().await {
