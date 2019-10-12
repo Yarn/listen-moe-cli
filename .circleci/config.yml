@@ -61,8 +61,8 @@ jobs:
   publish-github-release:
     docker:
       - image: cibuilds/github:0.13
-    requires:
-      - build
+    # requires:
+    #   - build
     # filters:
     #   branches:
     #     ignore: /.*/
@@ -89,4 +89,6 @@ workflows:
       tags:
         only: /^\d+\.\d+\.\d+.*$/
     jobs:
-      - publish-github-release
+      - publish-github-release:
+        requires:
+          - build
