@@ -34,7 +34,7 @@ jobs:
           name: Build
           command: cargo build --release --target "$TARGET"
       - store_artifacts:
-          path: ./target/x86_64-unknown-linux-musl/release/listen-moe-cli
+          path: ./target/$TARGET/release/listen-moe-cli
       - save_cache:
           paths:
             - /usr/local/cargo/registry
