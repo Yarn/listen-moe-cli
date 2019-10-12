@@ -25,7 +25,7 @@ jobs:
       #     command: cargo generate-lockfile
       - restore_cache:
           keys:
-            - v6-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+            - v7-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Build debug
           # command: cargo build --all --all-targets
@@ -43,6 +43,8 @@ jobs:
       - save_cache:
           paths:
             - /usr/local/cargo/registry
+            - target/debug
+            - target/release
             - target/x86_64-unknown-linux-gnu/debug/.fingerprint
             - target/x86_64-unknown-linux-gnu/debug/build
             - target/x86_64-unknown-linux-gnu/debug/deps
@@ -50,7 +52,7 @@ jobs:
             - target/x86_64-unknown-linux-gnu/release/build
             - target/x86_64-unknown-linux-gnu/release/deps
             # - /usr/local/rustup
-          key: v6-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+          key: v7-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Run all tests
           command: cargo test --target "$TARGET"
