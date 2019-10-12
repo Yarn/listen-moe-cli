@@ -9,6 +9,8 @@ use crossbeam::channel::{ unbounded, Sender, Receiver };
 use rodio::source::Source;
 use lewton::inside_ogg::OggStreamReader;
 
+mod args;
+
 struct ChannelReader {
     recv: Receiver<u8>,
 }
@@ -92,6 +94,9 @@ impl rodio::source::Source for VorbisStream {
 async fn main() {
     color_backtrace::install();
     
+    let args = args::get_args();
+    // println!("{}", args.volume);
+    
     let (ac_s, ac_r): (Sender<u8>, _) = unbounded();
     
     let reader = ChannelReader {
@@ -107,7 +112,7 @@ async fn main() {
         
         let device = rodio::default_output_device().unwrap();
         
-        rodio::play_raw(&device, decoder.amplify(0.1).convert_samples());
+        rodio::play_raw(&device, decoder.amplify(args.volume).convert_samples());
     });
     
     let https = HttpsConnector::new().unwrap();
