@@ -6,6 +6,9 @@ jobs:
     docker:
       # - image: rust:1
       - image: circleci/rust:1
+    environment:
+      TARGET: x86_64-unknown-linux-gnu
+      PKG_CONFIG_ALLOW_CROSS: 1
     steps:
       - checkout
       - run:
@@ -14,6 +17,9 @@ jobs:
       - run:
           name: Install Target
           command: rustup target add x86_64-unknown-linux-musl
+      - run:
+          name: Install Dependencies
+          command: sudo apt-get install libasound2-dev libssl-dev
       # - run:
       #     name: Calculate dependencies
       #     command: cargo generate-lockfile
@@ -23,10 +29,10 @@ jobs:
       - run:
           name: Build debug
           # command: cargo build --all --all-targets
-          command: cargo build --target "x86_64-unknown-linux-musl"
+          command: cargo build --target "$TARGET"
       - run:
           name: Build
-          command: cargo build --release --target "x86_64-unknown-linux-musl"
+          command: cargo build --release --target "$TARGET"
       - store_artifacts:
           path: ./target/x86_64-unknown-linux-musl/release/listen-moe-cli
       - save_cache:
@@ -41,4 +47,4 @@ jobs:
           key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Run all tests
-          command: cargo test --target "x86_64-unknown-linux-musl"
+          command: cargo test --target "$TARGET"
