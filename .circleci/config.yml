@@ -45,7 +45,7 @@ jobs:
       - persist_to_workspace:
         root: ./release
         paths:
-          - *
+          - "*"
       - save_cache:
           paths:
             - /usr/local/cargo/registry
