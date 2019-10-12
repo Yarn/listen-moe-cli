@@ -43,12 +43,12 @@ jobs:
       - save_cache:
           paths:
             - /usr/local/cargo/registry
-            - target/debug/x86_64-unknown-linux-gnu/.fingerprint
-            - target/debug/x86_64-unknown-linux-gnu/build
-            - target/debug/x86_64-unknown-linux-gnu/deps
-            - target/release/x86_64-unknown-linux-gnu/.fingerprint
-            - target/release/x86_64-unknown-linux-gnu/build
-            - target/release/x86_64-unknown-linux-gnu/deps
+            - target/x86_64-unknown-linux-gnu/debug/.fingerprint
+            - target/x86_64-unknown-linux-gnu/debug/build
+            - target/x86_64-unknown-linux-gnu/debug/deps
+            - target/x86_64-unknown-linux-gnu/release/.fingerprint
+            - target/x86_64-unknown-linux-gnu/release/build
+            - target/x86_64-unknown-linux-gnu/release/deps
             - /usr/local/rustup
           key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
