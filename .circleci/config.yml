@@ -89,6 +89,7 @@ workflows:
       tags:
         only: /^\d+\.\d+\.\d+.*$/
     jobs:
+      - build
       - publish-github-release:
           requires:
             - build
