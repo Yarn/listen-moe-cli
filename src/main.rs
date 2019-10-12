@@ -105,6 +105,7 @@ async fn main() {
         recv: ac_r,
     };
     
+    let volume = args.volume;
     std::thread::spawn(move || {
         let decoder = VorbisStream {
             ogg: OggStreamReader::new(reader).unwrap(),
@@ -114,18 +115,24 @@ async fn main() {
         
         let device = rodio::default_output_device().unwrap();
         
-        rodio::play_raw(&device, decoder.amplify(args.volume).convert_samples());
+        rodio::play_raw(&device, decoder.amplify(volume).convert_samples());
     });
     
     let https = HttpsConnector::new().unwrap();
     let client = Client::builder().build::<_, hyper::Body>(https);
     
+    let url = if args.kpop {
+        "https://listen.moe/kpop/stream"
+    } else {
+        "https://listen.moe/stream"
+    };
+    
     let mut req = Request::builder();
     let req = req
         .method("GET")
-        .uri("https://listen.moe/stream")
+        .uri(url)
         .header("Range", "bytes=0-")
-        .header("Referer", "https://listen.moe/stream")
+        .header("Referer", url)
         .header("User-Agent", shared::USER_AGENT)
         .body(hyper::Body::empty())
         .expect("request builder");
@@ -135,8 +142,9 @@ async fn main() {
     
     // println!("{:?}", res);
     
-    tokio::spawn(async {
-        let ws = websocket::connect().await;
+    let kpop = args.kpop;
+    tokio::spawn(async move {
+        let ws = websocket::connect(kpop).await;
         
         let (_send, mut recv) = websocket::wrap_ws(ws).await;
         
@@ -154,8 +162,8 @@ async fn main() {
                     let artists = song.get("artists").unwrap().as_array().unwrap();
                     for artist in artists {
                         if let Some(name) = artist.get("name") {
-                            let name = name.as_str().unwrap();
-                            let name_romaji = artist.get("nameRomaji").map(|x| x.as_str().unwrap()).unwrap_or("");
+                            let name = name.as_str().unwrap_or("");
+                            let name_romaji = artist.get("nameRomaji").map(|x| x.as_str().unwrap_or("")).unwrap_or("");
                             println!("  artist: {} ({})", name, name_romaji);
                         }
                     }

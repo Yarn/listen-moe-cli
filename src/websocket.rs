@@ -15,15 +15,21 @@ use crate::shared;
 
 type WsStream = WebSocketStream<hyper::upgrade::Upgraded>;
 
-pub async fn connect() -> WsStream {
+pub async fn connect(kpop: bool) -> WsStream {
     
     let https = HttpsConnector::new().unwrap();
     let client = Client::builder().build::<_, hyper::Body>(https);
     
+    let url = if kpop {
+        "https://listen.moe/kpop/gateway_v2"
+    } else {
+        "https://listen.moe/gateway_v2"
+    };
+    
     let mut req = Request::builder();
     let req = req
         .method("GET")
-        .uri("https://listen.moe/gateway_v2")
+        .uri(url)
         .header("User-Agent", shared::USER_AGENT)
         
         .header("Upgrade", "websocket")

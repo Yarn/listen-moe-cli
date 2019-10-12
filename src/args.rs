@@ -14,21 +14,29 @@ pub fn get_matches() -> ArgMatches<'static> {
                 v.parse::<u32>().map(|_| ()).map_err(|_| { String::from("Not a number") })
             })
         )
+        .arg(Arg::with_name("kpop")
+            .long("kpop")
+            .short("k")
+        )
         .get_matches();
     
     matches
 }
 
+#[derive(Debug)]
 pub struct Args {
     pub volume: f32,
+    pub kpop: bool,
 }
 
 pub fn get_args() -> Args {
     let matches = get_matches();
     
     let volume: f32 = matches.value_of("volume").unwrap().parse::<u32>().unwrap() as f32 / 100.0;
+    let kpop: bool = matches.is_present("kpop");
     
     Args {
         volume: volume,
+        kpop: kpop,
     }
 }
