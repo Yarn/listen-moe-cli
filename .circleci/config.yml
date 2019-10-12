@@ -81,7 +81,10 @@ workflows:
   version: 2.1
   build:
     jobs:
-      - build
+      - build:
+          filters:
+            tags:
+              ignore: /.*/
   build_and_release:
     jobs:
       - build:
