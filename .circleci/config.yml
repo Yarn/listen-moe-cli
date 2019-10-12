@@ -1,0 +1,44 @@
+
+version: 2
+
+jobs:
+  test:
+    docker:
+      # - image: rust:1
+      - image: circleci/rust:1
+    steps:
+      - checkout
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - run:
+          name: Install Target
+          command: rustup target add x86_64-unknown-linux-musl
+      # - run:
+      #     name: Calculate dependencies
+      #     command: cargo generate-lockfile
+      - restore_cache:
+          keys:
+            - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Build debug
+          # command: cargo build --all --all-targets
+          command: cargo build --target "x86_64-unknown-linux-musl"
+      - run:
+          name: Build
+          command: cargo build --release --target "x86_64-unknown-linux-musl"
+      - store_artifacts:
+          path: ./target/x86_64-unknown-linux-musl/release/listen-moe-cli
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target/debug/.fingerprint
+            - target/debug/build
+            - target/debug/deps
+            - target/release/.fingerprint
+            - target/release/build
+            - target/release/deps
+          key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Run all tests
+          command: cargo test --target "x86_64-unknown-linux-musl"
