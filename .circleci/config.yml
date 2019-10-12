@@ -42,6 +42,10 @@ jobs:
           # path: ./target/x86_64-unknown-linux-gnu/release/listen-moe-cli
           path: ./release
           destination: .
+      - persist_to_workspace:
+        root: ./release
+        paths:
+          - *
       - save_cache:
           paths:
             - /usr/local/cargo/registry
