@@ -113,13 +113,15 @@ async fn main() {
     let https = HttpsConnector::new().unwrap();
     let client = Client::builder().build::<_, hyper::Body>(https);
     
+    const USER_AGENT: &'static str = concat!("user-moe-cli/", env!("CARGO_PKG_VERSION"), " (+https://github.com/Yarn/listen-moe-cli)");
+    
     let mut req = Request::builder();
     let req = req
         .method("GET")
         .uri("https://listen.moe/stream")
         .header("Range", "bytes=0-")
         .header("Referer", "https://listen.moe/stream")
-        .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36")
+        .header("User-Agent", USER_AGENT)
         .body(hyper::Body::empty())
         .expect("request builder");
         ;
