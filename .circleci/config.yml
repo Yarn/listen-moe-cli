@@ -90,5 +90,5 @@ workflows:
         only: /^\d+\.\d+\.\d+.*$/
     jobs:
       - publish-github-release:
-        requires:
-          - build
+          requires:
+            - build
