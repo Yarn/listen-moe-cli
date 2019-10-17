@@ -18,6 +18,9 @@ jobs:
     - name: Add rustup path
       if: matrix.os == 'macOS-latest'
       run: echo ::add-path::$HOME/.cargo/bin
+    - name: Install ubuntu deps
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install libasound2-dev libssl-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests
