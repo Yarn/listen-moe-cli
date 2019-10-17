@@ -1,0 +1,44 @@
+name: Rust
+
+# on: [push]
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Rust
+      if: matrix.os == 'macOS-latest'
+      run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+    - name: Add rustup path
+      if: matrix.os == 'macOS-latest'
+      run: echo ::add-path::$HOME/.cargo/bin
+    - name: Install ubuntu deps
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install libasound2-dev libssl-dev
+    - name: Build
+      run: cargo build --release --verbose
+    # - name: Set env
+    #   env:
+    #     OS: ${{ matrix.os }}
+    - name: Zip binary
+      run: |
+        mkdir release
+        zip --junk-paths "release/release.zip" ./target/release/listen-moe-cli
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: release/release.zip
+        asset_name: listen-moe-cli-github-action-${{ github.ref }}-${{ matrix.os }}.zip
+        tag: ${{ github.ref }}
+        # overwrite: true
