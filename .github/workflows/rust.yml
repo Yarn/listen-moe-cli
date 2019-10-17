@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install Rust
-      if: matrix.os == "macOS-latest"
+      if: matrix.os == 'macOS-latest'
       run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     - name: Build
       run: cargo build --verbose
