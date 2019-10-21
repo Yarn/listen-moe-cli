@@ -62,6 +62,73 @@ jobs:
       - run:
           name: Run all tests
           command: cargo test --target "$TARGET"
+  build-arm:
+    docker:
+      # - image: rust:1
+      - image: circleci/rust:1
+    environment:
+      TARGET: armv7-unknown-linux-musleabihf
+      PKG_CONFIG_ALLOW_CROSS: 1
+      OPENSSL_DIR: $HOME/deps_root/usr
+      OPENSSL_LIB_DIR: $HOME/deps_root/usr/lib/arm-linux-gnueabihf
+      OPENSSL_INCLUDE_DIR: $HOME/deps_root/usr/include/arm-linux-gnueabihf
+      SHORT_TARGET: armv6
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./release
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      -run:
+        name: Rust Setup
+        command: |
+          rustup target add $TARGET
+      - run:
+          name: Install Dependencies
+          command: |
+            echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ xenial main" | sudo tee -a /etc/apt/sources.list
+            sudo apt-get update
+            sudo apt-get download libasound2:armhf
+            sudo apt-get download libasound2-dev:armhf
+            sudo apt-get download libssl-dev:armhf
+            sudo apt-get download libssl1.0.0:armhf
+            dpkg -x libasound2_*.deb ./deps_root/
+            dpkg -x libssl-dev*.deb ./deps_root/
+            dpkg -x libssl1.0.0*.deb ./deps_root/
+            dpkg -x libasound2-dev*.deb ./deps_root/
+      - restore_cache:
+          keys:
+            - v7-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Rust Build
+          command: |
+            cargo build --target=$TARGET --release
+      - run:
+          name: prepare release zip
+          command: zip --junk-paths "release/$CIRCLE_PROJECT_REPONAME-$CIRCLE_TAG-armv7-unknown-linux-musleabihf.zip" ./target/armv7-unknown-linux-musleabihf/release/listen-moe-cli
+      - store_artifacts:
+          # path: ./target/x86_64-unknown-linux-gnu/release/listen-moe-cli
+          path: ./release
+          destination: arm
+      - persist_to_workspace:
+          root: ./release
+          paths:
+            - "*"
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target/debug
+            - target/release
+            - target/armv7-unknown-linux-musleabihf/debug/.fingerprint
+            - target/armv7-unknown-linux-musleabihf/debug/build
+            - target/armv7-unknown-linux-musleabihf/debug/deps
+            - target/armv7-unknown-linux-musleabihf/release/.fingerprint
+            - target/armv7-unknown-linux-musleabihf/release/build
+            - target/armv7-unknown-linux-musleabihf/release/deps
+            # - /usr/local/rustup
+          key: v7-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
+  
   publish-github-release:
     docker:
       - image: cibuilds/github:0.13
@@ -86,6 +153,12 @@ workflows:
   build:
     jobs:
       - build:
+          filters:
+            tags:
+              ignore: /.*/
+  build-arm:
+    jobs:
+      - build-arm:
           filters:
             tags:
               ignore: /.*/
