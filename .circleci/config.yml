@@ -173,6 +173,12 @@ workflows:
               ignore: /.*/
             tags:
               only: /^\d+\.\d+\.\d+.*$/
+      - build-arm:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d+.*$/
       - publish-github-release:
           filters:
             branches:
