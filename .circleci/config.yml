@@ -83,7 +83,7 @@ jobs:
           command: sudo ln -s `pwd` /project
       - restore_cache:
           keys:
-            - v8-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
+            - v9-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
@@ -127,10 +127,9 @@ jobs:
       - save_cache:
           paths:
             - /usr/local/cargo/registry
-            - /usr/local/rustup
             - target
             # - /usr/local/rustup
-          key: v8-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
+          key: v9-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
   
   publish-github-release:
     docker:
