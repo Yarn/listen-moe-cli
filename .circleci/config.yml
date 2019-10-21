@@ -80,7 +80,7 @@ jobs:
       - run:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
-      -run:
+      - run:
         name: Rust Setup
         command: |
           rustup target add $TARGET
