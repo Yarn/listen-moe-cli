@@ -67,11 +67,12 @@ jobs:
       # - image: rust:1
       - image: circleci/rust:1
     environment:
-      TARGET: armv7-unknown-linux-musleabihf
+      TARGET: arm-unknown-linux-gnueabihf
       PKG_CONFIG_ALLOW_CROSS: 1
-      OPENSSL_DIR: $HOME/deps_root/usr
-      OPENSSL_LIB_DIR: $HOME/deps_root/usr/lib/arm-linux-gnueabihf
-      OPENSSL_INCLUDE_DIR: $HOME/deps_root/usr/include/arm-linux-gnueabihf
+      RUSTFLAGS: "-C linker=arm-linux-gnueabihf-gcc -L/usr/arm-linux-gnueabihf/lib -L./deps_root/usr/lib/arm-linux-gnueabihf -L/usr/lib/arm-linux-gnueabihf"
+      OPENSSL_DIR: ./deps_root/usr
+      OPENSSL_LIB_DIR: ./deps_root/usr/lib/arm-linux-gnueabihf
+      OPENSSL_INCLUDE_DIR: ./deps_root/usr/include/arm-linux-gnueabihf
       SHORT_TARGET: armv6
     steps:
       - checkout
@@ -87,16 +88,21 @@ jobs:
       - run:
           name: Install Dependencies
           command: |
-            echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ buster main" | sudo tee -a /etc/apt/sources.list
+            echo "deb [arch=armhf] http://deb.debian.org/debian buster main" | sudo tee -a /etc/apt/sources.list
             sudo apt-get update
+            sudo apt-get install gcc-arm-linux-gnueabi
+            
+            sudo apt-get download libasound2-dev
             sudo apt-get download libasound2:armhf
             sudo apt-get download libasound2-dev:armhf
             sudo apt-get download libssl-dev:armhf
-            sudo apt-get download libssl1.0.0:armhf
+            # sudo apt-get download libssl1.0.0:armhf
             dpkg -x libasound2_*.deb ./deps_root/
             dpkg -x libssl-dev*.deb ./deps_root/
-            dpkg -x libssl1.0.0*.deb ./deps_root/
+            # dpkg -x libssl1.0.0*.deb ./deps_root/
             dpkg -x libasound2-dev*.deb ./deps_root/
+            
+            # set -x PKG_CONFIG_PATH ./deps_root/usr/lib/arm-linux-gnueabihf/pkgconfig/alsa.pc $PKG_CONFIG_PATH
       - restore_cache:
           keys:
             - v7-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
@@ -118,14 +124,7 @@ jobs:
       - save_cache:
           paths:
             - /usr/local/cargo/registry
-            - target/debug
-            - target/release
-            - target/armv7-unknown-linux-musleabihf/debug/.fingerprint
-            - target/armv7-unknown-linux-musleabihf/debug/build
-            - target/armv7-unknown-linux-musleabihf/debug/deps
-            - target/armv7-unknown-linux-musleabihf/release/.fingerprint
-            - target/armv7-unknown-linux-musleabihf/release/build
-            - target/armv7-unknown-linux-musleabihf/release/deps
+            - target
             # - /usr/local/rustup
           key: v7-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
   
