@@ -83,7 +83,7 @@ jobs:
           command: sudo ln -s `pwd` /project
       - restore_cache:
           keys:
-            - v7-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
+            - v8-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
@@ -115,7 +115,7 @@ jobs:
             cargo build --target=$TARGET --release
       - run:
           name: prepare release zip
-          command: zip --junk-paths "release/$CIRCLE_PROJECT_REPONAME-$CIRCLE_TAG-armv7-unknown-linux-musleabihf.zip" ./target/armv7-unknown-linux-musleabihf/release/listen-moe-cli
+          command: zip --junk-paths "release/$CIRCLE_PROJECT_REPONAME-$CIRCLE_TAG-arm-unknown-linux-gnueabihf.zip" ./target/arm-unknown-linux-gnueabihf/release/listen-moe-cli
       - store_artifacts:
           # path: ./target/x86_64-unknown-linux-gnu/release/listen-moe-cli
           path: ./release
@@ -127,9 +127,10 @@ jobs:
       - save_cache:
           paths:
             - /usr/local/cargo/registry
+            - /usr/local/rustup
             - target
             # - /usr/local/rustup
-          key: v7-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
+          key: v8-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
   
   publish-github-release:
     docker:
