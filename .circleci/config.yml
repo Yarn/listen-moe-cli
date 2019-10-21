@@ -81,9 +81,9 @@ jobs:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
       - run:
-        name: Rust Setup
-        command: |
-          rustup target add $TARGET
+          name: Rust Setup
+          command: |
+            rustup target add $TARGET
       - run:
           name: Install Dependencies
           command: |
