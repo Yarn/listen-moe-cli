@@ -87,7 +87,7 @@ jobs:
       - run:
           name: Install Dependencies
           command: |
-            echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ xenial main" | sudo tee -a /etc/apt/sources.list
+            echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ buster main" | sudo tee -a /etc/apt/sources.list
             sudo apt-get update
             sudo apt-get download libasound2:armhf
             sudo apt-get download libasound2-dev:armhf
