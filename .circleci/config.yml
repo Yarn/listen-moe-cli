@@ -70,14 +70,20 @@ jobs:
       TARGET: arm-unknown-linux-gnueabihf
       PKG_CONFIG_ALLOW_CROSS: 1
       RUSTFLAGS: "-C linker=arm-linux-gnueabihf-gcc -L/usr/arm-linux-gnueabihf/lib -L./deps_root/usr/lib/arm-linux-gnueabihf -L/usr/lib/arm-linux-gnueabihf"
-      OPENSSL_DIR: ./deps_root/usr
-      OPENSSL_LIB_DIR: ./deps_root/usr/lib/arm-linux-gnueabihf
-      OPENSSL_INCLUDE_DIR: ./deps_root/usr/include/arm-linux-gnueabihf
+      OPENSSL_DIR: /project/deps_root/usr
+      OPENSSL_LIB_DIR: /project/deps_root/usr/lib/arm-linux-gnueabihf
+      OPENSSL_INCLUDE_DIR: /project/deps_root/usr/include/arm-linux-gnueabihf
       SHORT_TARGET: armv6
     steps:
       - checkout
       - attach_workspace:
           at: ./release
+      - run:
+          name: Symlink Project
+          command: sudo ln -s `pwd` /project
+      - restore_cache:
+          keys:
+            - v7-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
@@ -103,9 +109,6 @@ jobs:
             dpkg -x libasound2-dev*.deb ./deps_root/
             
             # set -x PKG_CONFIG_PATH ./deps_root/usr/lib/arm-linux-gnueabihf/pkgconfig/alsa.pc $PKG_CONFIG_PATH
-      - restore_cache:
-          keys:
-            - v7-cargo-cache-arm-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Rust Build
           command: |
