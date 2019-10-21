@@ -181,3 +181,4 @@ workflows:
               only: /^\d+\.\d+\.\d+.*$/
           requires:
             - build
+            - build-arm
